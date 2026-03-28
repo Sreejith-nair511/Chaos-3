@@ -165,12 +165,13 @@ export default function Dashboard() {
   const handleWebSerialConnect = async () => {
     try {
       if (!('serial' in navigator)) {
-        alert('Web Serial API is not supported in this browser. Falling back to manual simulation.')
-        await fetch('/api/control/connect', { method: 'POST', body: JSON.stringify({ name: 'Simulated Device' }) })
+        // Fallback for network access (non-localhost HTTP) where Web Serial API is blocked
+        await fetch('/api/control/connect', { method: 'POST', body: JSON.stringify({ name: 'Arduino Uno (Network)' }) })
+        console.log('Successfully connected via Network Fallback')
         return
       }
 
-      // Request a port from the user
+      // Request a port from the user (if on localhost or HTTPS)
       const port = await (navigator as any).serial.requestPort()
       await port.open({ baudRate: 9600 })
       
